@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Clientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1a365d;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        .lista-clientes {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .cliente-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .cliente-item:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .cliente-item input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .cliente-item input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .cliente-item input::placeholder {
+            color: #a0aec0;
+        }
+
+        .input-pago {
+            width: 120px;
+        }
+
+        .indicador-pago {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .indicador-pago.activo {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            box-shadow: 0 0 12px rgba(72, 187, 120, 0.4);
+            color: white;
+        }
+
+        .btn-eliminar {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: #fed7d7;
+            color: #c53030;
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .btn-eliminar.mostrar {
+            display: flex;
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .btn-eliminar:hover {
+            background: #fc8181;
+            transform: scale(1.05);
+        }
+
+        .btn-eliminar:active {
+            transform: scale(0.95);
+        }
+
+        .btn-agregar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+        }
+
+        .btn-agregar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+
+        .btn-agregar:active {
+            transform: translateY(0);
+        }
+
+        .btn-agregar-icono {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .resumen {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resumen-label {
+            color: #4a5568;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .resumen-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .resumen-total .moneda {
+            font-size: 18px;
+            color: #718096;
+            margin-right: 4px;
+        }
+
+        .vacio {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0aec0;
+        }
+
+        .vacio-icono {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .vacio-texto {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .cliente-item {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .cliente-item input {
+                min-width: 140px;
+            }
+
+            .resumen {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h1>👥 Mis Clientes</h1>
+                <p class="subtitle">Gestiona quién usa tu servicio y cuánto pagan</p>
+            </div>
+            <div id="contador" style="text-align: center; background: linear-gradient(135deg, #4299e1, #3182ce); color: white; border-radius: 12px; padding: 16px 20px; min-width: 80px;">
+                <div style="font-size: 28px; font-weight: 700;">0</div>
+                <div style="font-size: 12px; font-weight: 500; opacity: 0.9; margin-top: 4px;">Clientes</div>
+            </div>
+        </div>
+
+        <div class="lista-clientes" id="listaClientes"></div>
+
+        <button class="btn-agregar" onclick="agregarCliente()">
+            <span class="btn-agregar-icono">➕</span>
+            Agregar cliente
+        </button>
+
+        <div class="resumen" id="resumen" style="display: none;">
+            <span class="resumen-label">Total recaudado:</span>
+            <span class="resumen-total">
+                <span class="moneda">$</span><span id="totalPago">0</span>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        let clientes = [];
+        let idCounter = 0;
+        let longPressTimer = null;
+        let clienteActivo = null;
+
+        function agregarCliente() {
+            const cliente = {
+                id: idCounter++,
+                nombre: '',
+                pago: ''
+            };
+            clientes.push(cliente);
+            renderizarClientes();
+            ocultarTodosBtnEliminar();
+        }
+
+        function eliminarCliente(id, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            clientes = clientes.filter(c => c.id !== id);
+            renderizarClientes();
+        }
+
+        function actualizarCliente(id, campo, valor, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const cliente = clientes.find(c => c.id === id);
+            if (cliente) {
+                cliente[campo] = valor;
+                actualizarIndicador(id);
+                actualizarResumen();
+            }
+        }
+
+        function actualizarIndicador(id) {
+            const cliente = clientes.find(c => c.id === id);
+            if (!cliente) return;
+
+            const indicador = document.querySelector(`[data-indicador="${id}"]`);
+            const tienePago = cliente.pago && cliente.pago !== '';
+
+            if (indicador) {
+                indicador.classList.toggle('activo', tienePago);
+                indicador.textContent = tienePago ? '✓' : '';
+            }
+        }
+
+        function actualizarResumen() {
+            const resumen = document.getElementById('resumen');
+            if (clientes.length === 0) {
+                resumen.style.display = 'none';
+                return;
+            }
+
+            const totalPago = clientes.reduce((sum, c) => sum + (parseFloat(c.pago) || 0), 0);
+            resumen.style.display = 'flex';
+            document.getElementById('totalPago').textContent = totalPago.toFixed(2);
+        }
+
+        function mostrarBtnEliminar(id) {
+            ocultarTodosBtnEliminar();
+            const btn = document.querySelector(`[data-btn-eliminar="${id}"]`);
+            if (btn) {
+                btn.classList.add('mostrar');
+                clienteActivo = id;
+            }
+        }
+
+        function ocultarTodosBtnEliminar() {
+            document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.classList.remove('mostrar');
+            });
+            clienteActivo = null;
+        }
+
+        function iniciarLongPress(id, event) {
+            event.stopPropagation();
+            longPressTimer = setTimeout(() => {
+                mostrarBtnEliminar(id);
+            }, 500);
+        }
+
+        function cancelarLongPress(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            clearTimeout(longPressTimer);
+        }
+
+        function renderizarClientes() {
+            const lista = document.getElementById('listaClientes');
+            const resumen = document.getElementById('resumen');
+            const contador = document.getElementById('contador');
+
+            // Actualizar contador
+            if (contador) {
+                const numeroClientes = contador.querySelector('div');
+                numeroClientes.textContent = clientes.length;
+            }
+
+            if (clientes.length === 0) {
+                lista.innerHTML = `
+                    <div class="vacio">
+                        <div class="vacio-icono">📭</div>
+                        <div class="vacio-texto">No hay clientes aún.<br>¡Agrega tu primer cliente!</div>
+                    </div>
+                `;
+                resumen.style.display = 'none';
+                return;
+            }
+
+            lista.innerHTML = clientes.map(cliente => {
+                const tienePago = cliente.pago && cliente.pago !== '';
+
+                return `
+                    <div class="cliente-item" 
+                         data-cliente-id="${cliente.id}"
+                         onmousedown="iniciarLongPress(${cliente.id}, event)"
+                         onmouseup="cancelarLongPress(event)"
+                         onmouseleave="cancelarLongPress(event)"
+                         ontouchstart="iniciarLongPress(${cliente.id}, event)"
+                         ontouchend="cancelarLongPress(event)">
+                        <input
+                            type="text"
+                            placeholder="Nombre del cliente"
+                            value="${cliente.nombre}"
+                            oninput="actualizarCliente(${cliente.id}, 'nombre', this.value, event)"
+                        >
+                        <input
+                            type="text"
+                            placeholder="Puerta"
+                            value="${cliente.puerta || ''}"
+                            oninput="actualizarCliente(${cliente.id}, 'puerta', this.value, event)"
+                            style="max-width: 90px;"
+                        >
+                        <input
+                            type="number"
+                            placeholder="0.00"
+                            class="input-pago"
+                            value="${cliente.pago}"
+                            oninput="actualizarCliente(${cliente.id}, 'pago', this.value, event)"
+                            min="0"
+                            step="0.01"
+                        >
+                        <div class="indicador-pago ${tienePago ? 'activo' : ''}" data-indicador="${cliente.id}">
+                            ${tienePago ? '✓' : ''}
+                        </div>
+                        <button class="btn-eliminar" data-btn-eliminar="${cliente.id}" onclick="eliminarCliente(${cliente.id}, event)">×</button>
+                    </div>
+                `;
+            }).join('');
+
+            // Actualizar resumen
+            actualizarResumen();
+        }
+
+        // Event listener global para cerrar la X cuando se toca en cualquier lado
+        document.addEventListener('click', function(event) {
+            const esBtn = event.target.classList.contains('btn-eliminar');
+            const esItem = event.target.closest('.cliente-item');
+            const esInput = event.target.classList.contains('input-pago') || event.target.classList.contains('input-nombre');
+            const esIndicador = event.target.classList.contains('indicador-pago');
+            
+            // Si se clickea fuera de los items o en un item diferente, ocultar la X
+            if (!esBtn && !esInput && !esIndicador) {
+                ocultarTodosBtnEliminar();
+            }
+        });
+
+        // También para touch events
+        document.addEventListener('touchstart', function(event) {
+            const esBtn = event.target.classList.contains('btn-eliminar');
+            const esInput = event.target.classList.contains('input-pago') || event.target.classList.contains('input-nombre');
+            const esIndicador = event.target.classList.contains('indicador-pago');
+            
+            if (!esBtn && !esInput && !esIndicador) {
+                ocultarTodosBtnEliminar();
+            }
+        }, { passive: true });
+
+        // --- Sincronización con el bot de WhatsApp ---
+        const numerosYaAgregados = new Set();
+
+        async function sincronizarConBot() {
+            try {
+                const res = await fetch('/api/nombres');
+                const registros = await res.json();
+
+                let huboNuevos = false;
+                registros.forEach(reg => {
+                    if (!numerosYaAgregados.has(reg.numero)) {
+                        clientes.push({
+                            id: idCounter++,
+                            nombre: reg.nombre,
+                            puerta: reg.puerta,
+                            pago: '20'
+                        });
+                        numerosYaAgregados.add(reg.numero);
+                        huboNuevos = true;
+                    }
+                });
+
+                if (huboNuevos) renderizarClientes();
+            } catch (err) {
+                console.log('Bot no disponible todavía:', err.message);
+            }
+        }
+
+        sincronizarConBot();
+        setInterval(sincronizarConBot, 4000); // revisa cada 4 segundos
+
+        // Inicial
+        renderizarClientes();
+    </script>
+</body>
+</html>

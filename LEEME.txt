@@ -1,0 +1,67 @@
+GESTOR DE CLIENTES POR WHATSAPP (Baileys + Node.js)
+=====================================================
+
+Como estás en el móvil, la forma más práctica de correr esto es
+con la app "Termux" (Android, gratis, en F-Droid o Google Play)
+o subiéndolo a un servicio gratuito como Render.com / Railway.app
+(recomendado si quieres que esté encendido 24h sin depender del móvil).
+
+------------------------------------------------------
+OPCIÓN A: Correrlo en el propio móvil con Termux (Android)
+------------------------------------------------------
+1. Instala Termux (mejor desde F-Droid: f-droid.org).
+2. Abre Termux y ejecuta:
+   pkg update && pkg install nodejs git -y
+3. Descomprime este ZIP dentro de Termux (o usa el gestor de
+   archivos para moverlo a la carpeta de Termux) y entra:
+   cd gestor-whatsapp
+4. Instala las dependencias:
+   npm install
+5. Arranca el bot:
+   node index.js
+6. Aparecerá un código QR en la pantalla de Termux.
+   Ábrelo con WhatsApp: Ajustes > Dispositivos vinculados >
+   Vincular un dispositivo > escanea el QR.
+7. Abre en el navegador del móvil:
+   http://localhost:3000
+   Ahí verás tu gestor de clientes funcionando.
+
+IMPORTANTE: mientras Termux esté abierto y el comando "node index.js"
+corriendo, el bot funciona. Si cierras Termux, se apaga.
+
+------------------------------------------------------
+OPCIÓN B: Subirlo gratis a Render.com (recomendado, 24h encendido)
+------------------------------------------------------
+1. Crea una cuenta gratis en render.com
+2. Sube este proyecto a un repositorio de GitHub (puedes hacerlo
+   desde la web de GitHub subiendo el ZIP descomprimido, sin
+   necesidad de ordenador).
+3. En Render: "New +" > "Web Service" > conecta el repositorio.
+4. Comando de arranque: node index.js
+5. Despliega. En los "Logs" de Render aparecerá el código QR
+   (como texto ASCII) la primera vez — escanéalo con WhatsApp.
+6. Tu panel quedará accesible en la URL que te da Render
+   (algo como https://tu-proyecto.onrender.com)
+
+NOTA: el plan gratis de Render "duerme" el servicio si pasa mucho
+tiempo sin uso, y al reactivarse puede pedir escanear el QR de nuevo.
+
+------------------------------------------------------
+QUÉ HACE CADA ARCHIVO
+------------------------------------------------------
+- index.js            -> el bot de WhatsApp + servidor web
+- package.json         -> lista de dependencias a instalar
+- public/gestor_clientes.html -> tu panel, ya con el campo
+  "Bloque" añadido y sincronización automática cada 4 segundos
+- db.json              -> se crea solo al recibir el primer mensaje;
+  ahí se guardan nombre, bloque, número y fecha de cada persona
+
+------------------------------------------------------
+CÓMO FUNCIONA EL FLUJO
+------------------------------------------------------
+1. Alguien te escribe por WhatsApp por primera vez.
+2. El bot le pregunta el nombre, luego el bloque.
+3. Se guarda automáticamente en db.json.
+4. Tu panel (gestor_clientes.html) lo detecta solo y lo añade
+   a la lista, con el campo "pago" vacío para que tú lo rellenes
+   a mano cuando corresponda.
